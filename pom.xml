@@ -142,6 +142,13 @@
 
   </dependencies>
 
+  <scm>
+    <connection>scm:git:git://github.com/vanisett1/spring-petclinic.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:vanisett1/spring-petclinic.git</developerConnection>
+    <url>https://github.com/vanisett1/spring-petclinic</url>
+    <tag>HEAD</tag>
+  </scm>
+
   <build>
     <plugins>
       <plugin>
