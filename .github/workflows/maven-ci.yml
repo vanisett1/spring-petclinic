@@ -39,10 +39,11 @@ jobs:
         with:
           command: code test
 
-#---------------- release
+#---------------- release to GitHub Packages -------------------#
   release:
     # needs: [opensource-security, code-security, build]
     # needs: [ build ]
+    environment: github_release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
