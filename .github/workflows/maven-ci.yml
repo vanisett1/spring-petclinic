@@ -129,6 +129,7 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build -t spring-petclinic-app:${{ github.sha }} .
+          docker tag spring-petclinic-app:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/spring-petclinic-app:${{ github.sha }}
           docker tag spring-petclinic-app:${{ github.sha }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/spring-petclinic-app:latest
 
       # Push the Docker image to Amazon ECR
