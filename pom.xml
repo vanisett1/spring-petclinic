@@ -152,6 +152,14 @@
     <url>https://github.com/vanisett1/spring-petclinic</url>
     <tag>HEAD</tag>
   </scm>
+  
+  <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Spring Petclinic</name>
+            <url>https://maven.pkg.github.com/vanisett1/spring-petclinic</url>
+        </repository>
+    </distributionManagement>
 
   <build>
     <plugins>
