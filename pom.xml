@@ -36,6 +36,12 @@
     <nohttp-checkstyle.version>0.0.11</nohttp-checkstyle.version>
     <spring-format.version>0.0.41</spring-format.version>
 
+    <!-- SonarCloud properties -->
+    
+    <sonar.organization>agklya</sonar.organization>
+    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
+
   </properties>
 
   <dependencies>
@@ -144,7 +150,7 @@
 
   <scm>
     <connection>scm:git:git://github.com/vanisett1/spring-petclinic.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com:vanisett1/spring-petclinic.git</developerConnection>
+    <developerConnection>scm:git:https://git@github.com:vanisett1/spring-petclinic.git</developerConnection>
     <url>https://github.com/vanisett1/spring-petclinic</url>
     <tag>HEAD</tag>
   </scm>
