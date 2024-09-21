@@ -55,7 +55,14 @@ jobs:
           git config user.email "vanisetti1@gmail.com"
           git config user.name "GitHub Actions"
       - name: Publish JAR
-        run: mvn -B release:prepare release:perform -DskipTests
+        run: |
+          mvn -B release:prepare release:perform \
+            -DskipTests \
+            -Dscm.url=scm:git:git://github.com/${{ github.repository }}.git \
+            -Dscm.connection=scm:git:git://github.com/${{ github.repository }}.git \
+            -Dscm.developerConnection=scm:git:ssh://git@github.com:${{ github.repository }}.git \
+            -Dscm.tag=HEAD \
+            -Dresume=false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
