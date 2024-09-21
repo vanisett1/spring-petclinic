@@ -87,7 +87,7 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/spring-petclinic-app:latest
 
   opensource-monitor:
-    needs: [release]
+    # needs: [release]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
