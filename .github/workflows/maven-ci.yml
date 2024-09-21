@@ -61,13 +61,22 @@ jobs:
   #       env:
   #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-# ---------------- Release to Docker Hub ---------------- #
+  # ---------------- Release to Docker Hub ---------------- #
   release-dockerhub:
-    # needs: [ build ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      # Set up JDK 17 for the Maven build
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      # Build the JAR file using Maven
+      - name: Build JAR with Maven
+        run: mvn clean package -DskipTests
 
       # Build the Docker image
       - name: Build Docker Image
@@ -85,6 +94,7 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/spring-petclinic-app:${{ github.sha }}
           docker push ${{ secrets.DOCKER_USERNAME }}/spring-petclinic-app:latest
+
 
   opensource-monitor:
     # needs: [release]
