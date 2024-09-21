@@ -1,0 +1,66 @@
+name: DevSecOps CI pipeline
+
+on:
+  push:
+    branches: ['*']
+  pull_request:
+    branches: ['*']
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: ['17']
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'adopt'
+          cache: maven
+      - name: Build with Maven Wrapper
+        run: ./mvnw -B package
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Package
+          path: target/*.jar
+
+  opensource-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache Snyk CLI
+        uses: actions/cache@v4
+        with:
+          path: ~/.snyk
+          key: ${{ runner.os }}-snyk-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-snyk-
+      - name: Run Snyk to check for open-source vulnerabilities
+        uses: snyk/actions/maven@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+  code-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache Snyk CLI
+        uses: actions/cache@v4
+        with:
+          path: ~/.snyk
+          key: ${{ runner.os }}-snyk-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-snyk-
+      - name: Run Snyk to check for code vulnerabilities
+        uses: snyk/actions/maven@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: code test
