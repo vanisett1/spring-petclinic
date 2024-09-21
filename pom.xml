@@ -152,7 +152,7 @@
     <url>https://github.com/vanisett1/spring-petclinic</url>
     <tag>HEAD</tag>
   </scm>
-  
+
   <distributionManagement>
         <repository>
             <id>github</id>
