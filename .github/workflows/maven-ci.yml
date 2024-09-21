@@ -1,66 +1,73 @@
-name: DevSecOps CI pipeline
+name: Java CI with Maven
 
 on:
   push:
-    branches: ['*']
+    branches: [ main ]
   pull_request:
-    branches: ['*']
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        java: ['17']
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v4
-        with:
-          java-version: ${{ matrix.java }}
-          distribution: 'adopt'
-          cache: maven
-      - name: Build with Maven Wrapper
-        run: ./mvnw -B package
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: Package
-          path: target/*.jar
+    - uses: actions/checkout@v2
+    - name: Set up JDK 17
+      uses: actions/setup-java@v1
+      with:
+        java-version: 17
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
 
   opensource-security:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Cache Snyk CLI
-        uses: actions/cache@v4
-        with:
-          path: ~/.snyk
-          key: ${{ runner.os }}-snyk-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-snyk-
-      - name: Run Snyk to check for open-source vulnerabilities
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/maven@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
 
   code-security:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Cache Snyk CLI
-        uses: actions/cache@v4
-        with:
-          path: ~/.snyk
-          key: ${{ runner.os }}-snyk-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-snyk-
-      - name: Run Snyk to check for code vulnerabilities
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/maven@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: code test
+
+#---------------- release
+  release:
+    needs: [opensource-security, code-security, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - name: Set Git user
+        run: |
+          git config user.email "ghactions@brianvermeer.nl"
+          git config user.name "GitHub Actions"
+      - name: Publish JAR
+        run: mvn -B release:prepare release:perform -DskipTests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  opensource-monitor:
+    needs: [release]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/maven@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+
+
