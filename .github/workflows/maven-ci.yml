@@ -22,7 +22,7 @@ jobs:
   sonarcloud:
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
-    needs: build  # Ensures SonarCloud runs after the build
+    # needs: build  # Ensures SonarCloud runs after the build
     steps:
       # Checkout code
       - uses: actions/checkout@v4
